@@ -1,0 +1,19 @@
+{
+  "name": "dolan-script",
+  "version": "1.0.0",
+  "description": "Te best programin languag.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Capevace/dolan-script.git"
+  },
+  "author": "@Capevace",
+  "license": "CC",
+  "bugs": {
+    "url": "https://github.com/Capevace/dolan-script/issues"
+  },
+  "homepage": "https://github.com/Capevace/dolan-script#readme",
+  "bin": {
+    "dolan": ".bin/dolan.js"
+  }
+}

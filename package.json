@@ -14,6 +14,6 @@
   },
   "homepage": "https://github.com/Capevace/dolan-script#readme",
   "bin": {
-    "dolan": ".bin/dolan.js"
+    "dolan": "./.bin/dolan.js"
   }
 }

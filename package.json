@@ -1,6 +1,6 @@
 {
   "name": "dolan-script",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Te best programin languag.",
   "main": "src/call.js",
   "repository": {

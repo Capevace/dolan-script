@@ -1,3 +1,6 @@
 var compile = require('./');
 
-compile('(sey "lol\')pls', false)
+// Put your code in here
+var code = `(sey "lol')pls`
+
+compile(code, false)

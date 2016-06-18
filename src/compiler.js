@@ -192,7 +192,8 @@ function parser(tokens) {
 
   // But this time we're going to use recursion instead of a `while` loop. So we
   // define a `walk` function.
-  function walk() {
+  function walk(type) {
+    type = type || ''
 
     // Inside the walk function we start by grabbing the `current` token.
     var token = tokens[current];
@@ -259,8 +260,13 @@ function parser(tokens) {
       ) {
         // we'll call the `walk` function which will return a `node` and we'll
         // push it into our `node.params`.
+        // Pass type CallExpression so we can check for 'pls' semicolon
         node.params.push(walk());
         token = tokens[current];
+
+        if (!token) {
+          throw new TypeError('Function never closed')
+        }
       }
 
       // Finally we will increment `current` one last time to skip the closing

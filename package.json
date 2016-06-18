@@ -2,7 +2,7 @@
   "name": "dolan-script",
   "version": "1.0.1",
   "description": "Te best programin languag.",
-  "main": "index.js",
+  "main": "src/call.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Capevace/dolan-script.git"

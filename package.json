@@ -15,5 +15,6 @@
   "homepage": "https://github.com/Capevace/dolan-script#readme",
   "bin": {
     "dolan": "./.bin/dolan.js"
-  }
+  },
+  "tonicExample": "var compiler = require('dolan-script')\n\nvar code = '(sey 88)'\n\ncompile(code. true)"
 }

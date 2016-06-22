@@ -11,6 +11,7 @@ function tokenizer(input) {
   //
   // We do this because we may want to increment `current` many times within a
   // single loop because our tokens can be any length.
+
   while (current < input.length) {
 
     // We're also going to store the `current` character in the `input`.
@@ -176,6 +177,36 @@ function tokenizer(input) {
       }
     }
 
+    if (char === '{') {
+      // If we do, we push a new token with the type `paren` and set the value
+      // to an open parenthesis.
+      tokens.push({
+        type: 'bracket',
+        value: '{'
+      });
+
+      // Then we increment `current`
+      current++;
+
+      // And we `continue` onto the next cycle of the loop.
+      continue;
+    }
+
+    if (char === '}') {
+      // If we do, we push a new token with the type `paren` and set the value
+      // to an open parenthesis.
+      tokens.push({
+        type: 'bracket',
+        value: '}'
+      });
+
+      // Then we increment `current`
+      current++;
+
+      // And we `continue` onto the next cycle of the loop.
+      continue;
+    }
+
     // Finally if we have not matched a character by now, we're going to throw
     // an error and completely exit.
     throw new TypeError('I dont know what this character is: ' + char);
@@ -187,6 +218,7 @@ function tokenizer(input) {
 
 function parser(tokens) {
 
+console.log(tokens);
   // Again we keep a `current` variable that we will use as a cursor.
   var current = 0;
 
@@ -226,6 +258,47 @@ function parser(tokens) {
         type: 'StringLiteral',
         value: token.value
       };
+    }
+
+    if (token.type === 'bracket' && token.value === '{') {
+
+      // We'll increment `current` to skip the parenthesis since we don't care
+      // about it in our AST.
+      token = tokens[++current];
+
+      // We create a base node with the type `CallExpression`, and we're going
+      // to set the name as the current token's value since the next token after
+      // the open parenthesis is the name of the function.
+      var node = {
+        type: 'BracketLiteral',
+        name: '',
+        params: []
+      };
+
+      // So we create a `while` loop that will continue until it encounters a
+      // token with a `type` of `'paren'` and a `value` of a closing
+      // parenthesis.
+      while (
+        (token.type !== 'bracket') ||
+        (token.type === 'bracket' && token.value !== '}')
+      ) {
+        // we'll call the `walk` function which will return a `node` and we'll
+        // push it into our `node.params`.
+        // Pass type CallExpression so we can check for 'pls' semicolon
+        node.params.push(walk());
+        token = tokens[current];
+
+        if (!token) {
+          throw new TypeError('Function never closed')
+        }
+      }
+
+      // Finally we will increment `current` one last time to skip the closing
+      // parenthesis.
+      current++;
+
+      // And return the node.
+      return node;
     }
 
     // Next we're going to look for CallExpressions. We start this off when we
@@ -279,6 +352,7 @@ function parser(tokens) {
 
     // Again, if we haven't recognized the token type by now we're going to
     // throw an error.
+    console.log(token);
     throw new TypeError(token.type);
   }
 
@@ -307,6 +381,8 @@ function parser(tokens) {
 }
 
 function traverser(ast, visitor) {
+
+  console.log(JSON.stringify(ast, null, 2));
 
   // A `traverseArray` function that will allow us to iterate over an array and
   // call the next function that we will define: `traverseNode`.
@@ -353,6 +429,10 @@ function traverser(ast, visitor) {
         break;
 
       case 'StringLiteral':
+        break;
+
+      case 'BracketLiteral':
+        traverseArray(node.params, node);
         break;
 
       // And again, if we haven't recognized the node type then we'll throw an
@@ -407,6 +487,28 @@ function transformer(ast) {
       });
     },
 
+    BracketLiteral: function (node, parent) {
+      // We start creating a new node `CallExpression` with a nested
+      // `Identifier`.
+      var expression = {
+        type: 'BracketLiteral',
+        callee: {
+          type: 'Identifier',
+          name: node.name
+        },
+        calls: []
+      };
+
+      // Next we're going to define a new context on the original
+      // `CallExpression` node that will reference the `expression`'s arguments
+      // so that we can push arguments.
+      node._context = expression.arguments;
+
+      // Last, we push our (possibly wrapped) `CallExpression` to the `parent`'s
+      // `context`.
+      parent._context.push(expression);
+    },
+
     // Next up, `CallExpressions`.
     CallExpression: function(node, parent) {
 
@@ -451,7 +553,7 @@ function transformer(ast) {
 }
 
 function codeGenerator(node) {
-
+  console.log(JSON.stringify(node, null, 2));
   // We'll break things down by the `type` of the `node`.
   switch (node.type) {
 
@@ -492,6 +594,9 @@ function codeGenerator(node) {
 
     case 'StringLiteral':
       return '"' + node.value + '"';
+
+    case 'BracketLiteral':
+      return ((node.value === '{') ? 'function ()' : '') + node.value;
 
     // And if we haven't recognized the node, we'll throw an error.
     default:

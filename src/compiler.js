@@ -472,6 +472,7 @@ function transformer(ast) {
     NumberLiteral: function(node, parent) {
       // We'll create a new node also named `NumberLiteral` that we will push to
       // the parent context.
+      console.log('NUMBER', parent);
       parent._context.push({
         type: 'NumberLiteral',
         value: node.value
@@ -481,6 +482,7 @@ function transformer(ast) {
     StringLiteral: function(node, parent) {
       // We'll create a new node also named `NumberLiteral` that we will push to
       // the parent context.
+      console.log('STRING', parent);
       parent._context.push({
         type: 'StringLiteral',
         value: node.value
@@ -490,12 +492,14 @@ function transformer(ast) {
     BracketLiteral: function (node, parent) {
       // We start creating a new node `CallExpression` with a nested
       // `Identifier`.
+      console.log('PARENT', parent, parent._context);
       var expression = {
         type: 'BracketLiteral',
         callee: {
           type: 'Identifier',
           name: node.name
         },
+        value: node.value,
         calls: []
       };
 
@@ -541,6 +545,7 @@ function transformer(ast) {
         };
       }
 
+      console.log('FUN', parent);
       // Last, we push our (possibly wrapped) `CallExpression` to the `parent`'s
       // `context`.
       parent._context.push(expression);
@@ -553,7 +558,7 @@ function transformer(ast) {
 }
 
 function codeGenerator(node) {
-  console.log(JSON.stringify(node, null, 2));
+  // console.log(JSON.stringify(node, null, 2));
   // We'll break things down by the `type` of the `node`.
   switch (node.type) {
 
